@@ -1,3 +1,16 @@
+*> 
+-------------------------------------------------------------
+CASE STUDY - GROUP 2 -REGION AVERAGE 
+-------------------------------------------------------------
+NOTES: 
+ Code's Updates: [12-28-24, 12:25 PM] 
+
+FEATURES ADDED / CHANGES DONE:
+DECEMBER 28: Flexible sales and region.
+
+*>
+
+
 IDENTIFICATION DIVISION.
 PROGRAM-ID. SALES-REPORT.
 ENVIRONMENT DIVISION.
