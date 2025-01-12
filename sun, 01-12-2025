@@ -1,0 +1,100 @@
+       >> SOURCE FORMAT FREE
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TWOARRAY.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT OUTFILE ASSIGN TO "REGION.DAT".
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD OUTFILE
+           LABEL RECORDS ARE STANDARD
+           DATA RECORD IS REGION-REC.
+       01 REGION-REC PIC X(80).
+
+       WORKING-STORAGE SECTION.
+       01 NUM-REGIONS PIC 99.
+       01 NUM-SALESMAN PIC 99.
+       01 I PIC 9 VALUE 0.
+       01 J PIC 9 VALUE 0.
+       01 REGION-CODE OCCURS 100 TIMES PIC X(10).
+       01 SALES OCCURS 100 TIMES.
+           02 SALESMAN PIC 99999V99 OCCURS 3 TIMES.
+       01 TOTAL-SALES OCCURS 100 TIMES PIC 999999V99.
+
+       01 HDG-0.
+           02 FILLER PIC X(11) VALUE "REGION CODE".
+           02 FILLER PIC X(12) VALUE "SALESMAN 1".
+           02 FILLER PIC X(12) VALUE "SALESMAN 2".
+           02 FILLER PIC X(12) VALUE "SALESMAN 3".
+           02 FILLER PIC X(10) VALUE "TOTAL".
+
+       SCREEN SECTION.
+       01 SCRN.
+           02 BLANK SCREEN.
+
+       PROCEDURE DIVISION.
+
+       MAIN-LOGIC.
+           DISPLAY "Enter the number of regions: ".
+           ACCEPT NUM-REGIONS.
+
+           DISPLAY "Enter the number of salesmen (max 3): ".
+           ACCEPT NUM-SALESMAN.
+
+           IF NUM-SALESMAN > 3 OR NUM-SALESMAN < 1
+               DISPLAY "Number of salesmen must be between 1 and 3."
+               STOP RUN.
+
+           PERFORM INPUT-REGIONS.
+           PERFORM INPUT-SALES.
+           PERFORM CALCULATE-TOTALS.
+
+           OPEN OUTPUT OUTFILE.
+           PERFORM HDG-RTN.
+           PERFORM PROCESS-RTN.
+           PERFORM FIN-RTN.
+           STOP RUN.
+
+       HDG-RTN.
+           WRITE REGION-REC FROM HDG-0 AFTER 1 LINE.
+
+PROCESS-RTN.
+    PERFORM VARYING I FROM 1 BY 1 UNTIL I > NUM-REGIONS
+        MOVE REGION-CODE (I) TO REGION-REC(1:10)
+        MOVE SALES(1) TO REGION-REC(11:2)   *> Adjusted the length for SALES(1)
+        MOVE SALES(2) TO REGION-REC(13:2)   *> Adjusted the length for SALES(2)
+        MOVE TOTAL-SALES(I) TO REGION-REC(15:10)
+        WRITE REGION-REC
+    END-PERFORM.
+
+
+       FIN-RTN.
+           CLOSE OUTFILE.
+
+      CALCULATE-TOTALS.
+           PERFORM VARYING I FROM 1 BY 1 UNTIL I > NUM-REGIONS
+               MOVE 0 TO TOTAL-SALES (I)
+               PERFORM VARYING J FROM 1 BY 1 UNTIL J > NUM-SALESMAN
+                   ADD SALES (I, J) TO TOTAL-SALES (I)
+               END-PERFORM
+           END-PERFORM.
+
+      INPUT-REGIONS.
+           PERFORM VARYING I FROM 1 BY 1 UNTIL I > NUM-REGIONS
+               DISPLAY "Enter REGION CODE for Region " I ": ".
+               ACCEPT REGION-CODE (I)
+           END-PERFORM.
+
+      INPUT-SALES.
+           PERFORM VARYING I FROM 1 BY 1 UNTIL I > NUM-REGIONS
+               DISPLAY "Enter sales for Region " REGION-CODE (I) ": ".
+               PERFORM VARYING J FROM 1 BY 1 UNTIL J > NUM-SALESMAN
+                   DISPLAY "Enter sales for SALESMAN " J ": ".
+                   ACCEPT SALES (J)
+               END-PERFORM
+           END-PERFORM.
+
+       STOP RUN.
